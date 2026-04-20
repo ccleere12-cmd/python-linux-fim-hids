@@ -1,22 +1,12 @@
 {
     "/home/cjcleere/python-linux-fim-hids/test-monitor-directory/test-monitor-directory3/test-monitor-file5": {
-        "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "last_modified": 1776694641.410194,
-        "size": 0
+        "hash": "58eff2254213ccf4053419cb8c576a23a70ea5c8d42e6aebe10ac71170eb09da",
+        "last_modified": 1776699175.0484056,
+        "size": 15
     },
     "/home/cjcleere/python-linux-fim-hids/test-monitor-directory/test-monitor-file": {
-        "hash": "12ea12eace7d655f471ce55e34f89b1b77a3d9d05a445ca82877dd2235beaa51",
-        "last_modified": 1776694641.410194,
-        "size": 6
-    },
-    "/home/cjcleere/python-linux-fim-hids/test-monitor-directory/test-monitor-file2": {
-        "hash": "8eefdfa35348df2ec75eeed0daf25afe217b15de4c3353eef916744c4e4bc100",
-        "last_modified": 1776694641.410194,
-        "size": 7
-    },
-    "/home/cjcleere/python-linux-fim-hids/test-monitor-directory2/test-monitor-file3": {
-        "hash": "58eff2254213ccf4053419cb8c576a23a70ea5c8d42e6aebe10ac71170eb09da",
-        "last_modified": 1776694641.410194,
+        "hash": "9e5cd1c9301ccde44328a8617523ff6590fbdbd84eab8dd70994da949f0cd228",
+        "last_modified": 1776699167.464479,
         "size": 15
     },
     "/home/cjcleere/python-linux-fim-hids/test-monitor-directory2/test-monitor-file4": {

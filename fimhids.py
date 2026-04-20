@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 # Next things TODO (most likely in this order): 
-#   - Do Cron
 #   - Maybe make the baseline reliability and first-run behavior better and safer (maybe by seperating where they run; also, see notes in Word and what Chat said)
 #   - Maybe add exclusion/ignore rules to answer this: What should I skip inside the monitored directories I choose in the config file. They would be added to the config file
 #   - Maybe use pathlib module (instead of os) where you can
 #   - When reading the binary of a large file, reading all at once is risky. So maybe read in chunks
 #   - Maybe add file permission and/or ownership tracking (see Chat #8 and notes)
 #   - Maybe add summary reporting per scan (see Chat #7)
+#   - Maybe show milliseconds (and maybe timezone) in the log entries
 #   - Maybe add file type in metadata
 #   - Maybe add option to have log entries be sent to the user via email (and/or something else like to the terminal and/or a phone number)
 #   - Figure out error checking (see notes). Ask Chat to teach you how to do error checking (probably including try…catch) for this project (especially with dictionaries and nested dictionaries) without giving any answers
@@ -15,17 +15,12 @@
 #   - Fix, clean up and add comments
 #   - Figure out what the permissions on each file in your project should be
 
-# Cron entry for the script to run once a month on the last day of the month at 11:59pm:
-# 59 23 31 * * /courses/cscn345/sp26/cjcleere/labs/theCronJob2.txt
+# Cron entry: */5 * * * * /usr/bin/python3 /home/cjcleere/python-linux-fim-hids/fimhids.py >> /home/cjcleere/python-linux-fim-hids/cron.log 2>&1
 
 import os
 import hashlib
 import json
 from datetime import datetime
-
-# MONITOR_DIRECTORY = os.path.expanduser("~/python-linux-fim-hids/test-monitor-directory/")
-# BASELINE_FILE = os.path.expanduser("~/python-linux-fim-hids/baseline.json")
-# LOG_FILE = os.path.expanduser("~/python-linux-fim-hids/audit.log")
 
 BASE_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE = os.path.join(BASE_DIRECTORY, "config.json")
