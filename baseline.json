@@ -1,27 +1,27 @@
 {
-    "C:\\Users\\cclee/python-linux-fim-hids/test-monitor-directory/test-monitor-directory3\\test-monitor-file5": {
+    "/home/cjcleere/python-linux-fim-hids/test-monitor-directory/test-monitor-directory3/test-monitor-file5": {
         "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "last_modified": 1776641309.2059076,
+        "last_modified": 1776694641.410194,
         "size": 0
     },
-    "C:\\Users\\cclee/python-linux-fim-hids/test-monitor-directory/test-monitor-file": {
+    "/home/cjcleere/python-linux-fim-hids/test-monitor-directory/test-monitor-file": {
         "hash": "12ea12eace7d655f471ce55e34f89b1b77a3d9d05a445ca82877dd2235beaa51",
-        "last_modified": 1776641221.7176602,
+        "last_modified": 1776694641.410194,
         "size": 6
     },
-    "C:\\Users\\cclee/python-linux-fim-hids/test-monitor-directory/test-monitor-file2": {
+    "/home/cjcleere/python-linux-fim-hids/test-monitor-directory/test-monitor-file2": {
         "hash": "8eefdfa35348df2ec75eeed0daf25afe217b15de4c3353eef916744c4e4bc100",
-        "last_modified": 1776633876.4508429,
+        "last_modified": 1776694641.410194,
         "size": 7
     },
-    "C:\\Users\\cclee/python-linux-fim-hids/test-monitor-directory2/test-monitor-file3": {
-        "hash": "7e648f292c8e3367325ecb935d2dfd14ff80b46a33a44bc14435a76d6f8e2e22",
-        "last_modified": 1776634281.424031,
-        "size": 16
+    "/home/cjcleere/python-linux-fim-hids/test-monitor-directory2/test-monitor-file3": {
+        "hash": "58eff2254213ccf4053419cb8c576a23a70ea5c8d42e6aebe10ac71170eb09da",
+        "last_modified": 1776694641.410194,
+        "size": 15
     },
-    "C:\\Users\\cclee/python-linux-fim-hids/test-monitor-directory2/test-monitor-file4": {
+    "/home/cjcleere/python-linux-fim-hids/test-monitor-directory2/test-monitor-file4": {
         "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "last_modified": 1776544879.0474,
+        "last_modified": 1776694641.410194,
         "size": 0
     }
 }

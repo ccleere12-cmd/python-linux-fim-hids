@@ -9,10 +9,11 @@
 #   - Maybe add file permission and/or ownership tracking (see Chat #8 and notes)
 #   - Maybe add summary reporting per scan (see Chat #7)
 #   - Maybe add file type in metadata
-#   - Maybe add option to have log entries be sent to the user via email (or something else)
+#   - Maybe add option to have log entries be sent to the user via email (and/or something else like to the terminal and/or a phone number)
 #   - Figure out error checking (see notes). Ask Chat to teach you how to do error checking (probably including try…catch) for this project (especially with dictionaries and nested dictionaries) without giving any answers
 #   - Figure out the right folders to monitor in Linux and why. Also, if you do exclusions, figure out the right stuff to exclude/ignore in Linux
 #   - Fix, clean up and add comments
+#   - Figure out what the permissions on each file in your project should be
 
 # Cron entry for the script to run once a month on the last day of the month at 11:59pm:
 # 59 23 31 * * /courses/cscn345/sp26/cjcleere/labs/theCronJob2.txt
