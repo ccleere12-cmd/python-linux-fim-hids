@@ -2,24 +2,23 @@
 
 # Next things TODO (most likely in this order): 
 #   - Maybe make the baseline reliability and first-run behavior better and safer (maybe by seperating where they run; also, see notes in Word and what Chat said)
-#   - Maybe add exclusion/ignore rules to answer this: What should I skip inside the monitored directories I choose in the config file. They would be added to the config file
 #   - Maybe use pathlib module (instead of os) where you can
 #   - When reading the binary of a large file, reading all at once is risky. So maybe read in chunks
 #   - Maybe add file permission and/or ownership tracking (see Chat #8 and notes)
 #   - Maybe add summary reporting per scan (see Chat #7)
-#   - Maybe show milliseconds (and maybe timezone) in the log entries
+#   - Maybe use UTC for the time in the log entries
 #   - Maybe add file type in metadata
 #   - Maybe add option to have log entries be sent to the user via email (and/or something else like to the terminal and/or a phone number)
-#   - Figure out error checking (see notes). Ask Chat to teach you how to do error checking (probably including try…catch) for this project (especially with dictionaries and nested dictionaries) without giving any answers
+#   - Figure out error checking (see notes), and when to use .get(...) instead of [...]. Ask Chat to teach you how to do error checking (probably including try…catch) for this project (especially with dictionaries and nested dictionaries) without giving any answers
 #   - Figure out the right folders to monitor in Linux and why. Also, if you do exclusions, figure out the right stuff to exclude/ignore in Linux
 #   - Fix, clean up and add comments
 #   - Figure out what the permissions on each file in your project should be
 
-# Cron entry: */5 * * * * /usr/bin/python3 /home/cjcleere/python-linux-fim-hids/fimhids.py >> /home/cjcleere/python-linux-fim-hids/cron.log 2>&1
+# Cron entry: */5 * * * * /usr/bin/python3 /home/cjcleere/python-fim-hids/fim_hids.py >> /home/cjcleere/python-fim-hids/cron.log 2>&1
 
 import os
-import hashlib
 import json
+import hashlib
 from datetime import datetime
 
 BASE_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -33,13 +32,15 @@ def load_config():
 def scan_directories(config):
     file_metadata = {}
     for directory in config["monitored_directories"]:
-        for root, _, files in os.walk(os.path.expanduser(directory)):  # expands ~ to user's home directory
+        for root, dirs, files in os.walk(os.path.expanduser(directory)):  # expands ~ to user's home directory
+            dirs[:] = [d for d in dirs if d not in config["excluded_directories"]]
             for file in files:
-                file_path = os.path.join(root, file)
-                file_metadata[file_path] = {
-                    "hash": calculate_hash(file_path),
-                    "last_modified": os.path.getmtime(file_path),
-                    "size": os.path.getsize(file_path)
+                if not file.endswith(tuple(config["excluded_extensions"])):
+                    file_path = os.path.join(root, file)
+                    file_metadata[file_path] = {
+                        "hash": calculate_hash(file_path),
+                        "last_modified": os.path.getmtime(file_path),
+                        "size": os.path.getsize(file_path)
                 }
     return file_metadata
 

@@ -1,8 +1,16 @@
 {
     "monitored_directories": [
-        "~/python-linux-fim-hids/test-monitor-directory/",
-        "~/python-linux-fim-hids/test-monitor-directory2/"
+        "~/python-fim-hids/test1/",
+        "~/python-fim-hids/test2/"
     ],
-    "baseline_file": "~/python-linux-fim-hids/baseline.json",
-    "log_file": "~/python-linux-fim-hids/audit.log"
+    "baseline_file": "~/python-fim-hids/baseline.json",
+    "log_file": "~/python-fim-hids/audit.log",
+    "excluded_directories": [
+        "test3",
+        "test5"
+    ],
+    "excluded_extensions": [
+        ".log",
+        ".tmp"
+    ]
 }
