@@ -1,21 +1,6 @@
 #!/usr/bin/env python3
 
-# Maybe FIX (one's path is not expanded while the other is)
-# 2026-04-23T17:40:21 event=BASELINE_RECREATED path="~/python-fim-hids/baseline.json"
-# 2026-04-23T17:41:13 event=MODIFIED path="C:\Users\cclee/python-fim-hids/test2/test5\i.txt" size_old=6 size_new=0 last_modified_old="2026-04-21T17:22:44" last_modified_new="2026-04-23T17:41:10"
-
-
-# Next things TODO (most likely in this order): 
-#   !- Maybe add file permission and/or ownership tracking (see Chat #8 and notes)
-#   !- Maybe add summary reporting per scan (see Chat #7)
-#   !- Maybe add option to have log entries be sent to the user via email (and/or something else like to the terminal and/or a phone number)
-#   !- The project treats an empty dictionary as invalid for a baseline, but if the monitored directories are empty, then {} technically could be correct. Maybe fix this
-#   - Figure out error checking (see notes; also see comment in this script for Chat's error checking example), and when to use .get(...) instead of [...]. Ask Chat to teach you how to do error checking (probably including try…catch) for this project (especially with dictionaries and nested dictionaries) without giving any answers. Also figure out where the error messages will be displayed (probably in cron.log). Test cron.log to see if it works and if it logs the errors (and other stuff) you want it to log. Also figure out what the try...except that you implemented will do in relation to cron.log
-#   !- Figure out the right folders to monitor in Linux and why. Also, if you do exclusions, figure out the right stuff to exclude/ignore in Linux
-#   - Fix, clean up and add comments
-#   - Figure out what the permissions on each file in your project should be
-
-# Cron entry: */5 * * * * /usr/bin/python3 /home/cjcleere/python-fim-hids/fim_hids.py >> /home/cjcleere/python-fim-hids/cron.log 2>&1
+# Cron entry: */10 * * * * /usr/bin/python3 /home/cjcleere/python-fim-hids/fim_hids.py >> /home/cjcleere/python-fim-hids/cron.log 2>&1
 
 import os
 import json
@@ -86,9 +71,9 @@ def log_baseline_error(baseline_is_missing, baseline_is_invalid, config):
 
     with open(os.path.expanduser(config["log_file"]), "a") as f:
         if baseline_is_missing:
-            f.write(f'{timestamp} event=BASELINE_MISSING path="{config["baseline_file"]}"\n')
+            f.write(f'{timestamp} event=BASELINE_MISSING path="{os.path.expanduser(config["baseline_file"])}"\n')
         elif baseline_is_invalid:
-            f.write(f'{timestamp} event=BASELINE_INVALID path="{config["baseline_file"]}"\n')
+            f.write(f'{timestamp} event=BASELINE_INVALID path="{os.path.expanduser(config["baseline_file"])}"\n')
 
 def scan_directories(config):
     file_metadata = {}
@@ -148,9 +133,9 @@ def log_baseline_fix(baseline_is_missing, baseline_is_invalid, config):
 
     with open(os.path.expanduser(config["log_file"]), "a") as f:
         if baseline_is_missing:
-            f.write(f'{timestamp} event=BASELINE_CREATED path="{config["baseline_file"]}"\n')
+            f.write(f'{timestamp} event=BASELINE_CREATED path="{os.path.expanduser(config["baseline_file"])}"\n')
         elif baseline_is_invalid:
-            f.write(f'{timestamp} event=BASELINE_RECREATED path="{config["baseline_file"]}"\n')
+            f.write(f'{timestamp} event=BASELINE_RECREATED path="{os.path.expanduser(config["baseline_file"])}"\n')
 
 def load_baseline(config):
     with open(os.path.expanduser(config["baseline_file"]), "r") as f:
@@ -197,39 +182,58 @@ def main():
         "MODIFIED": []
     }
 
-    # If config.json is missing, has invalid JSON, or any of the required keys are missing, then print error and return None
+    # Loads the information from config.json and stores it in a dictionary called config.
+    # If config.json is missing, has invalid JSON, or any of the required keys are missing, then print error and return None.
     config = load_config()
     if config is None:
         return
 
-    baseline_is_missing, baseline_is_invalid = check_baseline_status(config)
+    # Returns (baseline_is_missing, baseline_is_invalid) and stores in two variables:
+    # If baseline missing returns (True, False).  
+    # If baseline invalid (empty or bad JSON) returns (False, True).
+    # If baseline exists and is valid returns (False, False).
+    baseline_is_missing, baseline_is_invalid = check_baseline_status(config)  # Tuple unpacking
 
     if baseline_is_missing or baseline_is_invalid:
-
+        
+        # If baseline is missing it logs it in audit.log.
+        # If baseline is invalid it logs it in audit.log.
         log_baseline_error(baseline_is_missing, baseline_is_invalid, config)
 
-        # Scans MONITOR_DIRECTORY recursively, and creates a dictionary of the paths (keys) and hashes (values) of all the files that are recursively in the directory and returns it back to main to store in baseline_metadata
+        # Scans directories recursively (and excludes the necessary files and directories from the config)
+        # to create a snapshot of each file and its metadata (i.e., hashes, size, and last modified time). 
+        # Then, returns it back to main as a dictionary and stores it in baseline_metadata.
+
+        # Creates or recreates the baseline by scanning the directories recursively and creating
+        # a snapshot of each file and its metadata. Then stores in baseline_metadata (a dictionary)
         baseline_metadata = scan_directories(config)
 
-        # Opens the JSON baseline file to write to, and writes the dictionary (that was created from the scan) of file paths and hashes to the file
+        # Opens the JSON baseline file, and writes the baseline_metadata dictionary to the file
         if write_baseline(config, baseline_metadata):  # Function returns True if successful, and False if unsuccessful
+
+            # If writing the baseline was successful, it logs in audit.log that baseline
+            # was created (if it was missing) or recreated (if it was previously invalid)
             log_baseline_fix(baseline_is_missing, baseline_is_invalid, config)
         else:
             return
     else:
-        # Loads the baseline from the JSON baseline file and returns it (as a dictionary) back to main to store in baseline_metadata
+        # Loads the baseline from the JSON baseline file and returns it 
+        # (as a dictionary) back to main to store in baseline_metadata
         baseline_metadata = load_baseline(config)
 
-        # Scans MONITOR_DIRECTORY recursively, and creates a dictionary of the paths (keys) and hashes (values) of all the files that are recursively in the directory and returns it back to main to store in current_metadata
+        # Scans directories recursively to get a current snapshot of each file and
+        # its metadata. Then returns it back to main to store in current_metadata
         current_metadata = scan_directories(config)
 
-        # Compares current hashes and baseline hashes, and stores the detected changes (and the files they happened to) in the file_changes dictionary
+        # Compares current hashes of the files and baseline hashes of the file, and stores the 
+        # detected changes (and the files they happened to) in the file_changes dictionary
         detect_file_changes(baseline_metadata, current_metadata, file_changes)
 
-        # Writes the detected changes (and the files they happened to) to audit.log
+        # Writes the detected changes (along with the files they happened to and the metadata of the files) to audit.log
         log_changes(config, file_changes, baseline_metadata, current_metadata)
 
-        # If changes were detected (i.e., if any of the three values in the file_changes dictionary are not empty), update the JSON baseline file so next time the script runs it will use the correct baseline
+        # If changes were detected (i.e., if any of the three values in the file_changes dictionary are not empty), 
+        # update the JSON baseline file so next time the script runs it will use the correct baseline
         if file_changes["NEW"] or file_changes["DELETED"] or file_changes["MODIFIED"]:
             if not write_baseline(config, current_metadata):  # Function returns True if successful, and False if unsuccessful
                 return

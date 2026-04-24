@@ -1,0 +1,12 @@
+{
+    "/home/cjcleere/python-fim-hids/test1/test4/b.txt": {
+        "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "last_modified": 1777059960.8502522,
+        "size": 0
+    },
+    "/home/cjcleere/python-fim-hids/test2/e.txt": {
+        "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "last_modified": 1777059968.2701495,
+        "size": 0
+    }
+}

@@ -6,8 +6,7 @@
     "baseline_file": "~/python-fim-hids/baseline.json",
     "log_file": "~/python-fim-hids/audit.log",
     "excluded_directories": [
-        "test3",
-        "test4"
+        "test3"
     ],
     "excluded_extensions": [
         ".log",
