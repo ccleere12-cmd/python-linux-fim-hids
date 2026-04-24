@@ -143,15 +143,15 @@ def load_baseline(config):
 
     return baseline_metadata
 
-def detect_file_changes(baseline_hashes, current_hashes, file_changes):
-    for file_path in current_hashes:
-        if file_path not in baseline_hashes:  
+def detect_file_changes(baseline_metadata, current_metadata, file_changes):
+    for file_path in current_metadata:
+        if file_path not in baseline_metadata:  
             file_changes["NEW"].append(file_path)
 
-    for file_path, metadata in baseline_hashes.items():
-        if file_path not in current_hashes:   
+    for file_path, metadata in baseline_metadata.items():
+        if file_path not in current_metadata:   
             file_changes["DELETED"].append(file_path)
-        elif metadata.get("hash") != current_hashes.get(file_path, {}).get("hash"):  # .get(...) is safer here
+        elif metadata.get("hash") != current_metadata.get(file_path, {}).get("hash"):  # .get(...) is safer here
             file_changes["MODIFIED"].append(file_path)
 
 def log_changes(config, file_changes, baseline_metadata, current_metadata):
