@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-# Cron entry: */10 * * * * /usr/bin/python3 /home/cjcleere/python-fim-hids/fim_hids.py >> /home/cjcleere/python-fim-hids/cron.log 2>&1
+# Example cron entry to run every 5 mins: 
+# */5 * * * * /usr/bin/python3 /home/cjcleere/python-fim-hids/fim_hids.py >> /home/cjcleere/python-fim-hids/cron.log 2>&1
 
 import os
 import json
@@ -182,58 +183,56 @@ def main():
         "MODIFIED": []
     }
 
-    # Loads the information from config.json and stores it in a dictionary called config.
-    # If config.json is missing, has invalid JSON, or any of the required keys are missing, then print error and return None.
+    # Load the information from config.json and store it in a dictionary called config. If config.json is
+    # missing, has invalid JSON, or any of the required keys are missing, then print error and return None.
     config = load_config()
     if config is None:
         return
 
-    # Returns (baseline_is_missing, baseline_is_invalid) and stores in two variables:
-    # If baseline missing returns (True, False).  
-    # If baseline invalid (empty or bad JSON) returns (False, True).
-    # If baseline exists and is valid returns (False, False).
+    # Return (baseline_is_missing, baseline_is_invalid) and store in two variables:
+    # - If baseline is missing return (True, False).  
+    # - If baseline is invalid (empty or bad JSON) return (False, True).
+    # - If baseline exists and is valid return (False, False).
     baseline_is_missing, baseline_is_invalid = check_baseline_status(config)  # Tuple unpacking
 
     if baseline_is_missing or baseline_is_invalid:
         
-        # If baseline is missing it logs it in audit.log.
-        # If baseline is invalid it logs it in audit.log.
+        # If baseline is missing, then log that error in audit.log.
+        # If baseline is invalid, then log that error in audit.log.
         log_baseline_error(baseline_is_missing, baseline_is_invalid, config)
 
-        # Scans directories recursively (and excludes the necessary files and directories from the config)
-        # to create a snapshot of each file and its metadata (i.e., hashes, size, and last modified time). 
-        # Then, returns it back to main as a dictionary and stores it in baseline_metadata.
-
-        # Creates or recreates the baseline by scanning the directories recursively and creating
-        # a snapshot of each file and its metadata. Then stores in baseline_metadata (a dictionary)
+        # Create or recreate the baseline by scanning the directories recursively (while ignoring the necessary file extensions
+        # and directories) and creating a snapshot of each file and its metadata. Then store in baseline_metadata (a dictionary)
         baseline_metadata = scan_directories(config)
-
-        # Opens the JSON baseline file, and writes the baseline_metadata dictionary to the file
+ 
+        # Open the JSON baseline file, and write the baseline_metadata dictionary to the file
         if write_baseline(config, baseline_metadata):  # Function returns True if successful, and False if unsuccessful
 
-            # If writing the baseline was successful, it logs in audit.log that baseline
+            # If writing the baseline was successful, log in audit.log that the baseline
             # was created (if it was missing) or recreated (if it was previously invalid)
             log_baseline_fix(baseline_is_missing, baseline_is_invalid, config)
         else:
             return
     else:
-        # Loads the baseline from the JSON baseline file and returns it 
+        # Load the baseline from the JSON baseline file and return it 
         # (as a dictionary) back to main to store in baseline_metadata
         baseline_metadata = load_baseline(config)
 
-        # Scans directories recursively to get a current snapshot of each file and
-        # its metadata. Then returns it back to main to store in current_metadata
+        # Scan directories recursively to get a current snapshot of each file and
+        # its metadata. Then return it back to main to store in current_metadata
         current_metadata = scan_directories(config)
 
-        # Compares current hashes of the files and baseline hashes of the file, and stores the 
-        # detected changes (and the files they happened to) in the file_changes dictionary
+        # Find file changes by comparing baseline_metadata with current_metadata (store these changes in the file_changes dictionary):
+        # - If any files are in current_metadata and not in baseline_metadata -> new file
+        # - If any files are in baseline_metadata and not in current_metadata -> deleted file
+        # - If any files have a different hash in baseline_metadata and current_metadata -> modified file
         detect_file_changes(baseline_metadata, current_metadata, file_changes)
 
-        # Writes the detected changes (along with the files they happened to and the metadata of the files) to audit.log
+        # Write the detected changes (along with the files they happened to and the metadata of the files) to audit.log
         log_changes(config, file_changes, baseline_metadata, current_metadata)
 
-        # If changes were detected (i.e., if any of the three values in the file_changes dictionary are not empty), 
-        # update the JSON baseline file so next time the script runs it will use the correct baseline
+        # If changes were detected (i.e., if any of the three values in the file_changes dictionary are not 
+        # empty), update the JSON baseline file so next time the script runs it will use the correct baseline
         if file_changes["NEW"] or file_changes["DELETED"] or file_changes["MODIFIED"]:
             if not write_baseline(config, current_metadata):  # Function returns True if successful, and False if unsuccessful
                 return
